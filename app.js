@@ -22,6 +22,11 @@ const confirmPayBtn = document.getElementById("confirmPayBtn");
 
 function showScreen(name) {
   stopScanner();
+
+  if ((name === "home" || name === "select") && window.location.search) {
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, "", cleanUrl);
+  }
   screens.forEach(s => s.classList.toggle("active", s.id === `screen-${name}`));
   homeBtn.classList.toggle("hidden", name === "home");
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -244,3 +249,25 @@ if ("serviceWorker" in navigator) {
 
 renderProducts();
 buildKeypad();
+
+/* V2：手機原生相機掃描完整商品網址後，直接進入該商品付款確認頁。
+   ?code=coffee / bread / pickle / ticket / trap
+*/
+function openProductFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const code = (params.get("code") || "").trim().toLowerCase();
+
+  if (!code) return;
+
+  if (products[code]) {
+    setTimeout(() => selectProduct(code), 150);
+  } else {
+    setTimeout(() => {
+      alert("這個商品 QR Code 無法辨識，請回到首頁重新選擇。");
+      showScreen("home");
+    }, 150);
+  }
+}
+
+openProductFromUrl();
+
