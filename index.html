@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f97316" />
+  <meta name="description" content="銀髮安心付：熟齡數位支付模擬練習網站" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>銀髮安心付</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button id="homeBtn" class="icon-btn hidden" aria-label="回到首頁">⌂</button>
+      <div>
+        <p class="eyebrow">熟齡數位支付模擬教具</p>
+        <h1>銀髮安心付</h1>
+      </div>
+      <button id="soundBtn" class="icon-btn" aria-label="切換語音">🔊</button>
+    </header>
+
+    <main id="app" tabindex="-1">
+      <section id="screen-home" class="screen active">
+        <div class="hero-card">
+          <div class="hero-icon">📱</div>
+          <h2>掃一下，我會付！</h2>
+          <p>這是教學模擬網站，<strong>不會連結銀行帳戶，也不會真的扣款。</strong></p>
+          <button class="primary-btn" data-action="start">開始練習</button>
+        </div>
+
+        <div class="safety-card">
+          <h3>付款前記得三件事</h3>
+          <div class="safety-grid">
+            <div><span>1</span><b>看店家</b><p>名稱是否正確</p></div>
+            <div><span>2</span><b>看金額</b><p>有沒有多一個零</p></div>
+            <div><span>3</span><b>再確認</b><p>無誤才按付款</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-select" class="screen">
+        <div class="section-heading">
+          <span class="step-pill">步驟 1 / 4</span>
+          <h2>選擇練習方式</h2>
+          <p>可直接點商品，也可以使用手機相機掃描。</p>
+        </div>
+
+        <button class="camera-btn" data-action="open-scanner">
+          <span>📷</span>
+          <div><b>掃描商品 QR Code</b><small>使用手機相機練習</small></div>
+        </button>
+
+        <div class="divider"><span>或直接選商品</span></div>
+        <div id="productList" class="product-list"></div>
+
+        <button class="danger-outline-btn" data-action="trap">
+          ⚠️ 練習辨識錯誤金額
+        </button>
+      </section>
+
+      <section id="screen-scanner" class="screen">
+        <div class="section-heading">
+          <span class="step-pill">掃描練習</span>
+          <h2>請對準 QR Code</h2>
+          <p>把 QR Code 放進框框內，保持手機穩定。</p>
+        </div>
+
+        <div class="scanner-wrap">
+          <video id="scannerVideo" playsinline muted></video>
+          <div class="scan-frame"><span></span></div>
+          <div id="scannerStatus" class="scanner-status">準備開啟相機⋯</div>
+        </div>
+
+        <button class="secondary-btn" data-action="stop-scanner">取消掃描</button>
+
+        <details class="fallback-box">
+          <summary>相機不能使用？點這裡</summary>
+          <p>可輸入商品代碼：coffee、bread、pickle、ticket、trap</p>
+          <input id="manualCode" type="text" inputmode="text" placeholder="例如：coffee" />
+          <button class="secondary-btn" data-action="manual-code">讀取代碼</button>
+        </details>
+      </section>
+
+      <section id="screen-confirm" class="screen">
+        <div class="section-heading">
+          <span class="step-pill">步驟 2 / 4</span>
+          <h2>請仔細確認</h2>
+          <p>先看店家，再看商品與付款金額。</p>
+        </div>
+
+        <div id="alertBox" class="alert-box hidden"></div>
+
+        <div class="payment-card">
+          <div class="merchant-row">
+            <div id="merchantIcon" class="merchant-icon">☕</div>
+            <div>
+              <span>付款店家</span>
+              <h3 id="merchantName">想要分享咖啡</h3>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <span>商品</span>
+            <b id="itemName">熱美式咖啡</b>
+          </div>
+
+          <div class="amount-box">
+            <span>付款金額</span>
+            <strong>NT$ <em id="amount">50</em></strong>
+          </div>
+        </div>
+
+        <div class="check-card">
+          <label class="check-line">
+            <input id="storeCheck" type="checkbox" />
+            <span>店家名稱正確</span>
+          </label>
+          <label class="check-line">
+            <input id="amountCheck" type="checkbox" />
+            <span>付款金額正確</span>
+          </label>
+        </div>
+
+        <button id="confirmPayBtn" class="primary-btn" data-action="confirm-payment" disabled>
+          資料正確，下一步
+        </button>
+        <button class="danger-outline-btn" data-action="report-problem">
+          金額或店家有問題
+        </button>
+      </section>
+
+      <section id="screen-verify" class="screen">
+        <div class="section-heading">
+          <span class="step-pill">步驟 3 / 4</span>
+          <h2>模擬付款驗證</h2>
+          <p>請輸入四位數練習密碼。這不是真實銀行密碼。</p>
+        </div>
+
+        <div class="pin-card">
+          <div id="pinDots" class="pin-dots" aria-label="已輸入 0 位">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div id="keypad" class="keypad"></div>
+          <button class="fingerprint-btn" data-action="fingerprint">☝️ 模擬指紋確認</button>
+        </div>
+
+        <p class="helper-text">教學提醒：真實付款時，密碼與驗證碼都不能告訴別人。</p>
+      </section>
+
+      <section id="screen-success" class="screen">
+        <div class="success-card">
+          <div class="success-mark">✓</div>
+          <h2>付款成功</h2>
+          <p id="successMerchant">想要分享咖啡</p>
+          <strong id="successAmount">NT$ 50</strong>
+          <div class="voice-note">🔊 系統會念出付款結果</div>
+        </div>
+
+        <div class="receipt">
+          <h3>電子收據</h3>
+          <div><span>交易時間</span><b id="receiptTime"></b></div>
+          <div><span>店家</span><b id="receiptMerchant"></b></div>
+          <div><span>商品</span><b id="receiptItem"></b></div>
+          <div><span>金額</span><b id="receiptAmount"></b></div>
+          <div><span>交易編號</span><b id="receiptNo"></b></div>
+        </div>
+
+        <button class="primary-btn" data-action="again">再練習一次</button>
+        <button class="secondary-btn" data-action="home">回到首頁</button>
+      </section>
+
+      <section id="screen-problem" class="screen">
+        <div class="problem-card">
+          <div class="problem-icon">🛑</div>
+          <h2>您發現問題了！</h2>
+          <p id="problemMessage">金額不正確，這筆付款已取消，不會扣款。</p>
+          <div class="lesson-box">
+            <b>做得很好</b>
+            <p>看到店家或金額不對時，要立刻停止，不要急著按付款。</p>
+          </div>
+          <button class="primary-btn" data-action="again">再練習一次</button>
+          <button class="secondary-btn" data-action="home">回到首頁</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>教學模擬系統｜不連結銀行、不產生真實交易</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
